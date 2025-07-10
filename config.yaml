@@ -1,0 +1,11 @@
+server:
+  port: 8080
+
+db:
+  host: localhost
+  port: ""
+  user: ""
+  password: ""
+  dbname: ""
+  sslmode: disable
+  timezone: Africa/Addis_Ababa
