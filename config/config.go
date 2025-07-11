@@ -1,11 +1,12 @@
 package config
 
 import (
-	"github.com/joho/godotenv"
-	"github.com/spf13/viper"
 	"log"
 	"strings"
 	"sync"
+
+	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -34,8 +35,8 @@ var (
 
 func GetConfig() *Config {
 	once.Do(func() {
-		// Load .env file into environment variables
-		err := godotenv.Load()
+		err := godotenv.Load("../.env", ".env")
+
 		if err != nil {
 			log.Println("Warning: .env file not found, relying on environment variables only")
 		}
