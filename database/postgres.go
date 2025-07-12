@@ -30,7 +30,6 @@ func NewPostgresDatabase(conf *config.Config) Database {
 			conf.Db.SSLMode,
 			conf.Db.TimeZone,
 		)
-		fmt.Println(dsn)
 
 		db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err != nil {

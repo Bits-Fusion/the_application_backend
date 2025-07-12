@@ -35,7 +35,7 @@ var (
 
 func GetConfig() *Config {
 	once.Do(func() {
-		err := godotenv.Load("../.env", ".env")
+		err := godotenv.Load()
 
 		if err != nil {
 			log.Println("Warning: .env file not found, relying on environment variables only")
