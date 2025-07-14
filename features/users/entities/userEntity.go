@@ -54,3 +54,9 @@ type InsertUserDTO struct {
 	FirstName   string
 	LastName    string
 }
+
+type FilterParams struct {
+	Page    int32
+	Limit   int32
+	OrderBy string
+}

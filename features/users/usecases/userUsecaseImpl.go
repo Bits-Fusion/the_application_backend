@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Bits-Fusion/the_application_backend/features/users/entities"
+	"github.com/Bits-Fusion/the_application_backend/features/users/models"
 	"github.com/Bits-Fusion/the_application_backend/features/users/repositories"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -24,7 +25,7 @@ func NewUserUsecase(
 
 func StandardizePhoneNumber(phoneNumber string) (string, error) {
 	if strings.TrimSpace(phoneNumber) == "" {
-		return "", errors.New("Invalid phone number")
+		return "", errors.New("invalid phone number")
 	}
 
 	cleaned := strings.ReplaceAll(phoneNumber, " ", "")
@@ -50,10 +51,10 @@ func StandardizePhoneNumber(phoneNumber string) (string, error) {
 		return "+251" + cleaned, nil
 	}
 
-	return "", errors.New("Invalid phone number")
+	return "", errors.New("invalid phone number")
 }
 
-func (r *userUsecaseImpl) CreateUser(in *entities.InsertUserDTO) error {
+func (r *userUsecaseImpl) CreateUser(in *models.UserModel) error {
 
 	phoneNumber, err := StandardizePhoneNumber(in.PhoneNumber)
 
@@ -62,7 +63,7 @@ func (r *userUsecaseImpl) CreateUser(in *entities.InsertUserDTO) error {
 	}
 
 	if _, err := r.UserRepository.GetUserData(entities.FilterByAll, in.Username, in.Email, phoneNumber); err == nil {
-		return errors.New("user exist")
+		return errors.New("user with this credential exist")
 	}
 
 	encryptedPassword, err := bcrypt.GenerateFromPassword(
@@ -81,7 +82,7 @@ func (r *userUsecaseImpl) CreateUser(in *entities.InsertUserDTO) error {
 		Password:    string(encryptedPassword),
 		FirstName:   in.FirstName,
 		LastName:    in.LastName,
-		Role:        in.Role,
+		Role:        "admin",
 	}
 
 	if err := r.UserRepository.InsertUserData(newDto); err != nil {
@@ -90,3 +91,5 @@ func (r *userUsecaseImpl) CreateUser(in *entities.InsertUserDTO) error {
 
 	return nil
 }
+
+// func (u *userUsecaseImpl) ListUsers() ([]entities.User, error)

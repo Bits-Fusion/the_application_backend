@@ -8,15 +8,15 @@ import (
 	"github.com/labstack/gommon/log"
 )
 
-type UserRepositoryImpl struct {
+type userRepositoryImpl struct {
 	db database.Database
 }
 
-func NewCockroachPostgresRepository(db database.Database) *UserRepositoryImpl {
-	return &UserRepositoryImpl{db: db}
+func NewUserPostgresRepository(db database.Database) *userRepositoryImpl {
+	return &userRepositoryImpl{db: db}
 }
 
-func (r *UserRepositoryImpl) InsertUserData(in *entities.InsertUserDTO) error {
+func (r *userRepositoryImpl) InsertUserData(in *entities.InsertUserDTO) error {
 
 	data := &entities.User{
 		Username:    in.Username,
@@ -40,7 +40,7 @@ func (r *UserRepositoryImpl) InsertUserData(in *entities.InsertUserDTO) error {
 	return nil
 }
 
-func (r *UserRepositoryImpl) GetUserData(filterBy entities.FilterField, values ...string) (entities.User, error) {
+func (r *userRepositoryImpl) GetUserData(filterBy entities.FilterField, values ...string) (entities.User, error) {
 	var user entities.User
 	db := r.db.GetDb()
 
@@ -67,7 +67,7 @@ func (r *UserRepositoryImpl) GetUserData(filterBy entities.FilterField, values .
 	}
 }
 
-func (r *UserRepositoryImpl) querySingleField(query string, values []string, user *entities.User) (entities.User, error) {
+func (r *userRepositoryImpl) querySingleField(query string, values []string, user *entities.User) (entities.User, error) {
 	if len(values) < 1 {
 		return *user, fmt.Errorf("missing query value")
 	}
