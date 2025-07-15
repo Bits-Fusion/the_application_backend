@@ -4,18 +4,26 @@ import (
 	"log"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Server *Server
-	Db     *Db
+	Server      *Server
+	Db          *Db
+	TokenConfig *TokenConfig
 }
 
 type Server struct {
 	Port int
+}
+
+type TokenConfig struct {
+	Secret string
+	Exp    time.Duration
+	Iss    string
 }
 
 type Db struct {
@@ -45,6 +53,11 @@ func GetConfig() *Config {
 		viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 		configInstance = &Config{
+			TokenConfig: &TokenConfig{
+				Secret: viper.GetString("JWT_SECRETE"),
+				Exp:    time.Hour * 24 * 3,
+				Iss:    "theApplication",
+			},
 			Server: &Server{
 				Port: viper.GetInt("SERVER_PORT"),
 			},

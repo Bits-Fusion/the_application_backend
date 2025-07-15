@@ -7,6 +7,7 @@ import (
 
 	"github.com/Bits-Fusion/the_application_backend/config"
 	"github.com/Bits-Fusion/the_application_backend/database"
+	"github.com/Bits-Fusion/the_application_backend/internal/auth"
 
 	userHandlers "github.com/Bits-Fusion/the_application_backend/features/users/handlers"
 	userRepo "github.com/Bits-Fusion/the_application_backend/features/users/repositories"
@@ -21,9 +22,10 @@ type echoServer struct {
 	app  *echo.Echo
 	db   database.Database
 	conf *config.Config
+	auth auth.Authenticator
 }
 
-func NewEchoServer(conf *config.Config, db database.Database) Server {
+func NewEchoServer(conf *config.Config, db database.Database) *echoServer {
 	echoApp := echo.New()
 	echoApp.Logger.SetLevel(log.DEBUG)
 
@@ -31,11 +33,15 @@ func NewEchoServer(conf *config.Config, db database.Database) Server {
 		app:  echoApp,
 		db:   db,
 		conf: conf,
+		auth: auth.NewJWTAuthenticator(
+			conf.TokenConfig.Secret,
+			conf.TokenConfig.Iss,
+			conf.TokenConfig.Iss,
+		),
 	}
 }
 
 func (s *echoServer) Start() {
-	log.Print("starting server")
 	s.app.Use(middleware.Recover())
 	s.app.Use(middleware.Logger())
 
@@ -59,7 +65,15 @@ func (s *echoServer) initializeUserHandlers() {
 	newUserUsecase := userUsecase.NewUserUsecase(
 		newUserRepo,
 	)
-	newUserHttp := userHandlers.NewUserHandler(newUserUsecase)
-	userRouters := s.app.Group("/v1/auth")
-	userRouters.POST("", newUserHttp.SignUp)
+	newUserHttp := userHandlers.NewUserHandler(newUserUsecase, s.conf.TokenConfig, s.auth)
+
+	userSign := s.app.Group("/v1/auth")
+
+	userSign.POST("/signup", newUserHttp.SignUp)
+	userSign.POST("/signin", newUserHttp.SignIn)
+
+	authRouter := s.app.Group("/v1/user")
+
+	authRouter.Use(s.JWTMiddleware)
+	authRouter.GET("/", newUserHttp.ListUsers)
 }

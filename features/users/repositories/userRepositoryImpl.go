@@ -38,6 +38,26 @@ func (r *userRepositoryImpl) InsertUserData(in *entities.InsertUserDTO) error {
 
 	log.Debugf("InsertCockroachData: %v", result.RowsAffected)
 	return nil
+
+}
+
+func (r *userRepositoryImpl) ListUsers(params entities.FilterParams) ([]entities.User, error) {
+	var users []entities.User
+
+	page := max(params.Page, 1)
+	limit := max(params.Limit, 10)
+
+	offset := (page - 1) * limit
+	order := "id asc"
+	if params.OrderBy != "" {
+		order = params.OrderBy
+	}
+
+	if err := r.db.GetDb().Order(order).Limit(int(limit)).Offset(int(offset)).Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }
 
 func (r *userRepositoryImpl) GetUserData(filterBy entities.FilterField, values ...string) (entities.User, error) {

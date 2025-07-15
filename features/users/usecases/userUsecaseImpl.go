@@ -92,4 +92,10 @@ func (r *userUsecaseImpl) CreateUser(in *models.UserModel) error {
 	return nil
 }
 
-// func (u *userUsecaseImpl) ListUsers() ([]entities.User, error)
+func (u *userUsecaseImpl) ListUser(params entities.FilterParams) ([]entities.User, error) {
+	return u.UserRepository.ListUsers(params)
+}
+
+func (u *userUsecaseImpl) GetUserData(filterBy entities.FilterField, values ...string) (entities.User, error) {
+	return u.UserRepository.GetUserData(filterBy, values...)
+}
