@@ -160,3 +160,45 @@ func (h *userHandlerImpl) ListUsers(e echo.Context) error {
 		"users": users,
 	})
 }
+
+func (h *userHandlerImpl) UpdateUser(c echo.Context) error {
+	id := c.Param("id")
+
+	var reqBody models.UserUpdateModel
+
+	if err := c.Bind(&reqBody); err != nil {
+		log.Errorf("Error binding request body: %v", err)
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"message": "Invalid request format",
+		})
+	}
+
+	if err := validate.Struct(reqBody); err != nil {
+		errs := make(map[string]string)
+
+		if validationErrs, ok := err.(validator.ValidationErrors); ok {
+			for _, fieldErr := range validationErrs {
+				errs[fieldErr.Field()] = fieldErr.Error()
+			}
+		} else {
+			errs["general"] = err.Error()
+		}
+
+		return c.JSON(http.StatusBadRequest, map[string]any{
+			"message": "Validation failed",
+			"errors":  errs,
+		})
+	}
+
+	user, err := h.userUsecase.UpdateUser(&reqBody, id)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]any{
+			"message": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]entities.User{
+		"user": user,
+	})
+}

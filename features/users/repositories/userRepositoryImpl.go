@@ -94,3 +94,43 @@ func (r *userRepositoryImpl) querySingleField(query string, values []string, use
 	err := r.db.GetDb().Where(query, values[0]).First(user).Error
 	return *user, err
 }
+
+func (r *userRepositoryImpl) UpdateUser(in *entities.InsertUserDTO, userId string) (entities.User, error) {
+	var user entities.User
+
+	if err := r.db.GetDb().First(&user, "id = ?", userId).Error; err != nil {
+		return entities.User{}, err
+	}
+
+	if in.Username != "" {
+		user.Username = in.Username
+	}
+
+	if in.Email != "" {
+		user.Email = in.Email
+	}
+
+	if in.PhoneNumber != "" {
+		user.PhoneNumber = in.PhoneNumber
+	}
+
+	if in.FirstName != "" {
+		user.FirstName = in.FirstName
+	}
+
+	if in.LastName != "" {
+		user.LastName = in.LastName
+	}
+
+	if in.Password != "" {
+		user.Password = in.Password
+	}
+
+	if err := r.db.GetDb().Save(&user).Error; err != nil {
+		return entities.User{}, err
+	}
+
+	user.Password = ""
+
+	return user, nil
+}

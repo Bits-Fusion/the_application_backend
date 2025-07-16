@@ -92,6 +92,72 @@ func (r *userUsecaseImpl) CreateUser(in *models.UserModel) error {
 	return nil
 }
 
+func (u *userUsecaseImpl) UpdateUser(in *models.UserUpdateModel, userId string) (entities.User, error) {
+	var user entities.InsertUserDTO
+
+	if in.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword(
+			[]byte(in.Password),
+			bcrypt.DefaultCost,
+		)
+		if err != nil {
+			return entities.User{}, err
+
+		}
+		user.Password = string(hashedPassword)
+	}
+
+	if in.Username != "" {
+		_, err := u.UserRepository.GetUserData(entities.FilterByUsername, in.Username)
+
+		if err == nil {
+			return entities.User{}, errors.New("user with this username already exist")
+		}
+
+		user.Username = in.Username
+	}
+
+	if in.Email != "" {
+		_, err := u.UserRepository.GetUserData(entities.FilterByEmail, in.Email)
+
+		if err == nil {
+			return entities.User{}, errors.New("user with this email already exist")
+		}
+
+		user.Email = in.Email
+	}
+
+	if in.PhoneNumber != "" {
+		standardPhone, err := StandardizePhoneNumber(in.PhoneNumber)
+
+		if err != nil {
+			return entities.User{}, errors.New("invalid phone number")
+		}
+
+		_, err = u.UserRepository.GetUserData(entities.FilterByPhoneNumber, standardPhone)
+
+		if err == nil {
+			return entities.User{}, errors.New("user with this phone number exist")
+		}
+
+		user.PhoneNumber = standardPhone
+	}
+
+	if in.LastName != "" {
+		user.LastName = in.LastName
+	}
+	if in.FirstName != "" {
+		user.FirstName = in.FirstName
+	}
+
+	updatedUser, err := u.UserRepository.UpdateUser(&user, userId)
+
+	if err != nil {
+		return entities.User{}, err
+	}
+	return updatedUser, nil
+}
+
 func (u *userUsecaseImpl) ListUser(params entities.FilterParams) ([]entities.User, error) {
 	return u.UserRepository.ListUsers(params)
 }

@@ -76,4 +76,5 @@ func (s *echoServer) initializeUserHandlers() {
 
 	authRouter.Use(s.JWTMiddleware)
 	authRouter.GET("/", newUserHttp.ListUsers)
+	authRouter.PATCH("/:id", newUserHttp.UpdateUser)
 }
