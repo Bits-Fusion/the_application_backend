@@ -2,12 +2,15 @@ package usecases
 
 import (
 	"errors"
+	"os"
 	"regexp"
 	"strings"
 
 	"github.com/Bits-Fusion/the_application_backend/features/users/entities"
 	"github.com/Bits-Fusion/the_application_backend/features/users/models"
 	"github.com/Bits-Fusion/the_application_backend/features/users/repositories"
+	"github.com/google/uuid"
+	"github.com/labstack/gommon/log"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -76,6 +79,7 @@ func (r *userUsecaseImpl) CreateUser(in *models.UserModel) error {
 	}
 
 	newDto := &entities.InsertUserDTO{
+		Id:          uuid.New(),
 		Username:    in.Username,
 		Email:       in.Email,
 		PhoneNumber: phoneNumber,
@@ -150,11 +154,25 @@ func (u *userUsecaseImpl) UpdateUser(in *models.UserUpdateModel, userId string) 
 		user.FirstName = in.FirstName
 	}
 
+	if in.ProfilePicture != "" {
+		privUser, err := u.GetUserData(entities.FilterByID, userId)
+		if err != nil {
+			return entities.User{}, err
+		}
+		if privUser.ProfileImage != "" {
+			if err := os.Remove(privUser.ProfileImage); err != nil {
+				log.Error(err)
+			}
+		}
+		user.ProfilePicture = in.ProfilePicture
+	}
+
 	updatedUser, err := u.UserRepository.UpdateUser(&user, userId)
 
 	if err != nil {
 		return entities.User{}, err
 	}
+
 	return updatedUser, nil
 }
 
@@ -164,4 +182,8 @@ func (u *userUsecaseImpl) ListUser(params entities.FilterParams) ([]entities.Use
 
 func (u *userUsecaseImpl) GetUserData(filterBy entities.FilterField, values ...string) (entities.User, error) {
 	return u.UserRepository.GetUserData(filterBy, values...)
+}
+
+func (u *userUsecaseImpl) DeleteUser(deletionMode models.DeleteMode, userId []string) (bool, error) {
+	return u.UserRepository.DeleteUser(deletionMode, userId...)
 }

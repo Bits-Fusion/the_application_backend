@@ -10,11 +10,6 @@
     "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).SignUp-fm"
   },
   {
-    "method": "POST",
-    "path": "/v1/auth/signin",
-    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).SignIn-fm"
-  },
-  {
     "method": "echo_route_not_found",
     "path": "/v1/user",
     "name": "github.com/labstack/echo/v4.init.func1"
@@ -25,9 +20,24 @@
     "name": "github.com/labstack/echo/v4.init.func1"
   },
   {
+    "method": "DELETE",
+    "path": "/v1/user/delete/:id",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).DeleteUser-fm"
+  },
+  {
+    "method": "POST",
+    "path": "/v1/auth/signin",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).SignIn-fm"
+  },
+  {
     "method": "GET",
     "path": "/v1/user/",
     "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).ListUsers-fm"
+  },
+  {
+    "method": "GET",
+    "path": "/v1/user/:id",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).GetUser-fm"
   },
   {
     "method": "PATCH",

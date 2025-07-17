@@ -10,10 +10,22 @@ type UserModel struct {
 }
 
 type UserUpdateModel struct {
-	Username    string `json:"username"`
-	PhoneNumber string `json:"phoneNumber"`
-	FirstName   string `json:"firstName"`
-	LastName    string `json:"lastName"`
-	Email       string `json:"email"`
-	Password    string `json:"password"`
+	Username       string `json:"username"`
+	PhoneNumber    string `json:"phoneNumber"`
+	FirstName      string `json:"firstName"`
+	LastName       string `json:"lastName"`
+	Email          string `json:"email"`
+	Password       string `json:"password"`
+	ProfilePicture string `json:"profilePicture"`
 }
+
+type ChunkDeletePayload struct {
+	UserIds []string `validate:"required" json:"userIds"`
+}
+
+type DeleteMode string
+
+const (
+	All    DeleteMode = "all"
+	Single DeleteMode = "single"
+)

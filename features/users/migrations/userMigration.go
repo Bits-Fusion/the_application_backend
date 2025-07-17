@@ -18,6 +18,7 @@ func main() {
 
 func userMigrate(db database.Database) {
 	log.Println("[info] creating users table")
+	_ = db.GetDb().Migrator().DropTable(&entities.User{})
 	if err := db.GetDb().AutoMigrate(&entities.User{}); err != nil {
 		log.Println(err)
 	}

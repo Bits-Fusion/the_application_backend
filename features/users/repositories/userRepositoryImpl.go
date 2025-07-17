@@ -1,10 +1,12 @@
 package repositories
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/Bits-Fusion/the_application_backend/database"
 	"github.com/Bits-Fusion/the_application_backend/features/users/entities"
+	"github.com/Bits-Fusion/the_application_backend/features/users/models"
 	"github.com/labstack/gommon/log"
 )
 
@@ -19,6 +21,7 @@ func NewUserPostgresRepository(db database.Database) *userRepositoryImpl {
 func (r *userRepositoryImpl) InsertUserData(in *entities.InsertUserDTO) error {
 
 	data := &entities.User{
+		Id:          in.Id,
 		Username:    in.Username,
 		Role:        entities.Role(in.Role),
 		Email:       in.Email,
@@ -58,6 +61,25 @@ func (r *userRepositoryImpl) ListUsers(params entities.FilterParams) ([]entities
 	}
 
 	return users, nil
+}
+
+func (r *userRepositoryImpl) DeleteUser(deleteMode models.DeleteMode, userId ...string) (bool, error) {
+	switch deleteMode {
+	case models.All:
+		ctx := r.db.GetDb().Delete(&entities.User{}, userId)
+		if ctx.RowsAffected == 0 {
+			return false, errors.New("no recored found with this Id")
+		}
+		return true, nil
+	case models.Single:
+		ctx := r.db.GetDb().Delete(&entities.User{}, userId[0])
+		if ctx.RowsAffected == 0 {
+			return false, errors.New("no recored found with this Id")
+		}
+		return true, nil
+	default:
+		return false, errors.New("invalid deletion mode")
+	}
 }
 
 func (r *userRepositoryImpl) GetUserData(filterBy entities.FilterField, values ...string) (entities.User, error) {
@@ -124,6 +146,10 @@ func (r *userRepositoryImpl) UpdateUser(in *entities.InsertUserDTO, userId strin
 
 	if in.Password != "" {
 		user.Password = in.Password
+	}
+
+	if in.ProfilePicture != "" {
+		user.ProfileImage = in.ProfilePicture
 	}
 
 	if err := r.db.GetDb().Save(&user).Error; err != nil {

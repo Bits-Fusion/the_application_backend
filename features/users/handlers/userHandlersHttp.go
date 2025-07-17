@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -11,6 +13,7 @@ import (
 	"github.com/Bits-Fusion/the_application_backend/features/users/usecases"
 	"github.com/Bits-Fusion/the_application_backend/internal/auth"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"golang.org/x/crypto/bcrypt"
@@ -134,6 +137,43 @@ func (h *userHandlerImpl) SignUp(c echo.Context) error {
 	})
 }
 
+func (h *userHandlerImpl) GetUser(e echo.Context) error {
+	userId := e.Param("id")
+	if _, err := uuid.Parse(userId); err != nil {
+		return e.JSON(http.StatusBadRequest, map[string]string{
+			"error": "invalid uuid string",
+		})
+	}
+	user, err := h.userUsecase.GetUserData(entities.FilterByID, userId)
+
+	if err != nil {
+		return e.JSON(http.StatusInternalServerError, map[string]string{
+			"error": err.Error(),
+		})
+	}
+	return e.JSON(http.StatusAccepted, map[string]entities.User{
+		"user": user,
+	})
+}
+
+func (h *userHandlerImpl) DeleteUser(c echo.Context) error {
+	userId := c.Param("id")
+	var userIds []string
+
+	userIds = append(userIds, userId)
+	_, err := h.userUsecase.DeleteUser(models.Single, userIds)
+
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusAccepted, map[string]any{
+		"message": "successfully deleted",
+	})
+}
+
 func (h *userHandlerImpl) ListUsers(e echo.Context) error {
 	limit := e.QueryParams().Get("limit")
 	page := e.QueryParams().Get("page")
@@ -151,8 +191,8 @@ func (h *userHandlerImpl) ListUsers(e echo.Context) error {
 	users, err := h.userUsecase.ListUser(param)
 
 	if err != nil {
-		return e.JSON(http.StatusInternalServerError, map[string]error{
-			"error": err,
+		return e.JSON(http.StatusInternalServerError, map[string]string{
+			"error": err.Error(),
 		})
 	}
 
@@ -188,6 +228,33 @@ func (h *userHandlerImpl) UpdateUser(c echo.Context) error {
 			"message": "Validation failed",
 			"errors":  errs,
 		})
+	}
+
+	file, err := c.FormFile("profile_image")
+
+	if err == nil {
+		src, err := file.Open()
+		if err != nil {
+			return err
+		}
+		defer src.Close()
+
+		fileName := uuid.New().String() + "_" + file.Filename
+		filePath := "uploads/profile_images/" + fileName
+
+		os.MkdirAll("uploads/profile_images", os.ModePerm)
+
+		dst, err := os.Create(filePath)
+		if err != nil {
+			return err
+		}
+		defer dst.Close()
+
+		if _, err := io.Copy(dst, src); err != nil {
+			return err
+		}
+
+		reqBody.ProfilePicture = filePath
 	}
 
 	user, err := h.userUsecase.UpdateUser(&reqBody, id)

@@ -1,6 +1,9 @@
 package entities
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type Role string
 
@@ -21,7 +24,7 @@ const (
 )
 
 type User struct {
-	Id           uint32    `json:"id"`
+	Id           uuid.UUID `json:"id" gorm:"type:uuid;primaryKey"`
 	Username     string    `json:"username"`
 	Role         Role      `json:"role" gorm:"type:role_enum"`
 	Email        string    `json:"email"`
@@ -36,23 +39,26 @@ type User struct {
 }
 
 type InsertUserData struct {
-	Username    string
-	Role        Role
-	Email       string
-	PhoneNumber string
-	Password    string
-	FirstName   string
-	LastName    string
+	Username       string
+	Role           Role
+	Email          string
+	PhoneNumber    string
+	Password       string
+	FirstName      string
+	LastName       string
+	ProfilePicture string
 }
 
 type InsertUserDTO struct {
-	Username    string
-	Role        string
-	Email       string
-	PhoneNumber string
-	Password    string
-	FirstName   string
-	LastName    string
+	Id             uuid.UUID
+	Username       string
+	Role           string
+	Email          string
+	PhoneNumber    string
+	Password       string
+	FirstName      string
+	LastName       string
+	ProfilePicture string
 }
 
 type FilterParams struct {

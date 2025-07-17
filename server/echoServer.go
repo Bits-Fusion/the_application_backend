@@ -75,6 +75,9 @@ func (s *echoServer) initializeUserHandlers() {
 	authRouter := s.app.Group("/v1/user")
 
 	authRouter.Use(s.JWTMiddleware)
+
 	authRouter.GET("/", newUserHttp.ListUsers)
+	authRouter.GET("/:id", newUserHttp.GetUser)
 	authRouter.PATCH("/:id", newUserHttp.UpdateUser)
+	authRouter.DELETE("/delete/:id", newUserHttp.DeleteUser)
 }
