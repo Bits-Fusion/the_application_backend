@@ -8,7 +8,7 @@ import (
 )
 
 func migrate() {
-	featuresDir := "../features"
+	featuresDir := "features"
 
 	entries, err := os.ReadDir(featuresDir)
 

@@ -62,9 +62,7 @@ func (s *echoServer) Start() {
 func (s *echoServer) initializeUserHandlers() {
 	newUserRepo := userRepo.NewUserPostgresRepository(s.db)
 
-	newUserUsecase := userUsecase.NewUserUsecase(
-		newUserRepo,
-	)
+	newUserUsecase := userUsecase.NewUserUsecase(newUserRepo)
 	newUserHttp := userHandlers.NewUserHandler(newUserUsecase, s.conf.TokenConfig, s.auth)
 
 	userSign := s.app.Group("/v1/auth")
