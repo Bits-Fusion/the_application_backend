@@ -127,7 +127,7 @@ func (h *userHandlerImpl) SignUp(c echo.Context) error {
 
 	if err := h.userUsecase.CreateUser(&reqBody); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"message": "Internal server error",
+			"message": err.Error(),
 		})
 	}
 
