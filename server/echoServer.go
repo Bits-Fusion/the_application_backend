@@ -50,7 +50,7 @@ func (s *echoServer) Start() {
 	})
 
 	serverUrl := fmt.Sprintf(":%d", s.conf.Server.Port)
-	s.initializeUserHandlers()
+	s.initializeUserRoutes()
 	data, err := json.MarshalIndent(s.app.Routes(), "", "  ")
 	if err != nil {
 		return
@@ -59,16 +59,15 @@ func (s *echoServer) Start() {
 	s.app.Logger.Fatal(s.app.Start(serverUrl))
 }
 
-func (s *echoServer) initializeUserHandlers() {
+func (s *echoServer) initializeUserRoutes() {
 	newUserRepo := userRepo.NewUserPostgresRepository(s.db)
-
 	newUserUsecase := userUsecase.NewUserUsecase(newUserRepo)
 	newUserHttp := userHandlers.NewUserHandler(newUserUsecase, s.conf.TokenConfig, s.auth)
 
 	userSign := s.app.Group("/v1/auth")
 
 	userSign.POST("/signup", newUserHttp.SignUp)
-	userSign.POST("/signin", newUserHttp.SignIn)
+	userSign.POST("/login", newUserHttp.SignIn)
 
 	authRouter := s.app.Group("/v1/user")
 

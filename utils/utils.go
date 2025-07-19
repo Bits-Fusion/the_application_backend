@@ -49,6 +49,48 @@ func migrate() {
 	}
 }
 
+func test() {
+	featuresDir := "features"
+
+	entries, err := os.ReadDir(featuresDir)
+
+	if err != nil {
+		log.Fatalf("Failed to read features directory: %v\n", err)
+	}
+
+	log.Println("Running tests...")
+
+	for _, entry := range entries {
+		if entry.IsDir() {
+			testPath := filepath.Join(featuresDir, entry.Name(), "tests")
+
+			if _, err := os.Stat(testPath); os.IsNotExist(err) {
+				continue
+			}
+
+			files, err := os.ReadDir(testPath)
+			if err != nil {
+				log.Printf("Failed to read %s: %v\n", testPath, err)
+				continue
+			}
+
+			for _, file := range files {
+				if filepath.Ext(file.Name()) == ".go" {
+					filePath := filepath.Join(testPath, file.Name())
+					log.Printf("Running %s\n", filePath)
+
+					cmd := exec.Command("go", "test", filePath)
+					cmd.Stdout = os.Stdout
+					cmd.Stderr = os.Stderr
+					if err := cmd.Run(); err != nil {
+						log.Printf("Failed to run %s: %v\n", filePath, err)
+					}
+				}
+			}
+		}
+	}
+}
+
 func main() {
 	args := os.Args
 	if len(args) == 1 {
@@ -58,6 +100,9 @@ func main() {
 	for _, arg := range args {
 		if arg == "--migrate" {
 			migrate()
+		}
+		if arg == "--test" {
+			test()
 		}
 	}
 }
