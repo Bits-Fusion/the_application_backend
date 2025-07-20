@@ -23,7 +23,7 @@ func (r *userRepositoryImpl) InsertUserData(in *entities.InsertUserDTO) error {
 	data := &entities.User{
 		Id:          in.Id,
 		Username:    in.Username,
-		Role:        entities.Role(in.Role),
+		Role:        entities.UserRole,
 		Email:       in.Email,
 		PhoneNumber: in.PhoneNumber,
 		Password:    in.Password,

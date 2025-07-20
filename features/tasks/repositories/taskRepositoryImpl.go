@@ -49,17 +49,14 @@ func (r *taskRepository) ListTask(params models.TaskFilterProps) ([]entities.Tas
 
 	query := r.db.GetDb().Model(&entities.Task{}).Preload("AssignedEmployee")
 
-	// AssignedTo (UUID as string)
 	if params.AssignedTo != uuid.Nil {
 		query = query.Where("assigned_employee_id = ?", params.AssignedTo.String())
 	}
 
-	// Priority filter
 	if params.Priority != models.AllPriority && params.Priority != "" {
 		query = query.Where("priority = ?", string(params.Priority))
 	}
 
-	// Status filter
 	if params.Status != models.AllStatus && params.Status != "" {
 		query = query.Where("status = ?", string(params.Status))
 	}
@@ -70,4 +67,8 @@ func (r *taskRepository) ListTask(params models.TaskFilterProps) ([]entities.Tas
 	}
 
 	return tasks, nil
+}
+
+func (r *taskRepository) UpdateTask(in *entities.InsertTask) (entities.Task, error) {
+	return entities.Task{}, nil
 }

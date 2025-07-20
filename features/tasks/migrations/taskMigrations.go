@@ -19,7 +19,7 @@ func main() {
 
 func userMigrate(db database.Database) {
 	log.Println("[info] creating Task table")
-	_ = db.GetDb().Migrator().DropTable(&entities.Task{})
+	// _ = db.GetDb().Migrator().DropTable(&entities.Task{})
 	if err := db.GetDb().AutoMigrate(&entities.Task{}); err != nil {
 		log.Println(err)
 	}

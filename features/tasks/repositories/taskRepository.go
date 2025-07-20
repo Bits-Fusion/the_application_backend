@@ -8,5 +8,5 @@ import (
 type TaskRepository interface {
 	CreateTask(in *entities.InsertTask) error
 	ListTask(filterOpts models.TaskFilterProps) ([]entities.Task, error)
-	// UpdateTask() (entities.Task, error)
+	UpdateTask(in *entities.InsertTask) (entities.Task, error)
 }
