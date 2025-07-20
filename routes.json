@@ -1,10 +1,5 @@
 [
   {
-    "method": "POST",
-    "path": "/v1/auth/signup",
-    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).SignUp-fm"
-  },
-  {
     "method": "echo_route_not_found",
     "path": "/v1/user/*",
     "name": "github.com/labstack/echo/v4.init.func1"
@@ -15,19 +10,14 @@
     "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).ListUsers-fm"
   },
   {
-    "method": "GET",
-    "path": "/v1/user/:id",
-    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).GetUser-fm"
+    "method": "PATCH",
+    "path": "/v1/task/:taskId",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/tasks/handlers.(*taskHandlerImpl).UpdateTask-fm"
   },
   {
     "method": "DELETE",
     "path": "/v1/user/delete/:id",
     "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).DeleteUser-fm"
-  },
-  {
-    "method": "GET",
-    "path": "/v1/task/",
-    "name": "github.com/Bits-Fusion/the_application_backend/features/tasks/handlers.(*taskHandlerImpl).ListTasks-fm"
   },
   {
     "method": "POST",
@@ -37,16 +27,6 @@
   {
     "method": "echo_route_not_found",
     "path": "/v1/user",
-    "name": "github.com/labstack/echo/v4.init.func1"
-  },
-  {
-    "method": "PATCH",
-    "path": "/v1/user/:id",
-    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).UpdateUser-fm"
-  },
-  {
-    "method": "echo_route_not_found",
-    "path": "/v1/task",
     "name": "github.com/labstack/echo/v4.init.func1"
   },
   {
@@ -61,7 +41,37 @@
   },
   {
     "method": "GET",
+    "path": "/v1/task/",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/tasks/handlers.(*taskHandlerImpl).ListTasks-fm"
+  },
+  {
+    "method": "DELETE",
+    "path": "/v1/task/:taskId",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/tasks/handlers.(*taskHandlerImpl).DeleteTask-fm"
+  },
+  {
+    "method": "GET",
     "path": "/v1/health",
     "name": "github.com/Bits-Fusion/the_application_backend/server.(*echoServer).Start.func1"
+  },
+  {
+    "method": "POST",
+    "path": "/v1/auth/signup",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).SignUp-fm"
+  },
+  {
+    "method": "GET",
+    "path": "/v1/user/:id",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).GetUser-fm"
+  },
+  {
+    "method": "PATCH",
+    "path": "/v1/user/:id",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).UpdateUser-fm"
+  },
+  {
+    "method": "echo_route_not_found",
+    "path": "/v1/task",
+    "name": "github.com/labstack/echo/v4.init.func1"
   }
 ]

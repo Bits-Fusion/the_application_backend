@@ -4,6 +4,7 @@ import (
 	"time"
 
 	userEntity "github.com/Bits-Fusion/the_application_backend/features/users/entities"
+	"github.com/google/uuid"
 )
 
 type TaskPriority string
@@ -29,7 +30,7 @@ type Task struct {
 	Date               time.Time       `json:"date"`
 	Place              string          `json:"place"`
 	Deadline           time.Time       `json:"deadline"`
-	AssignedEmployeeID string          `json:"assigned_employee_id"`
+	AssignedEmployeeID uuid.UUID       `json:"assigned_employee_id"`
 	AssignedEmployee   userEntity.User `json:"assigned_employee" gorm:"foreignKey:AssignedEmployeeID;references:Id;OnDelete:SET NULL"`
 	Priority           TaskPriority    `json:"priority" gorm:"type:priority_enum"`
 	Status             Status          `json:"status" gorm:"type:status_enum"`
@@ -47,4 +48,15 @@ type InsertTask struct {
 	AssignedEmployeeID string
 	Priority           TaskPriority
 	Status             Status
+}
+
+type UpdateTask struct {
+	Title              *string
+	Description        *string
+	Date               *time.Time
+	Place              *string
+	Deadline           *time.Time
+	AssignedEmployeeID *uuid.UUID
+	Priority           *TaskPriority
+	Status             *Status
 }
