@@ -94,7 +94,10 @@ func (h *userHandlerImpl) SignIn(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Can not create auth token"})
 	}
 
-	return c.JSON(http.StatusCreated, map[string]string{"token": token})
+	return c.JSON(http.StatusCreated, map[string]any{
+		"token": token,
+		"user":  user,
+	})
 
 }
 
