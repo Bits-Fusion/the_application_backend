@@ -29,3 +29,7 @@ func (u *taskUsecaseImpl) CreateTask(in *models.TaskModel) error {
 	}
 	return u.taskRepo.CreateTask(&task)
 }
+
+func (u *taskUsecaseImpl) ListTask(filterOpts models.TaskFilterProps) ([]entities.Task, error) {
+	return u.taskRepo.ListTask(filterOpts)
+}

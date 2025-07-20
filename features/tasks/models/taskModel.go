@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type TaskModel struct {
@@ -13,4 +15,31 @@ type TaskModel struct {
 	AssignedEmployeeID string    `validate:"required" json:"assignedTo"`
 	Priority           string    `validate:"required,oneof=low medium high" json:"priority"`
 	Status             string    `validate:"required,oneof=completed inprogress canceled" json:"status"`
+}
+
+type PriorityFilterOpt string
+
+const (
+	High        PriorityFilterOpt = "high"
+	Mid         PriorityFilterOpt = "mid"
+	Low         PriorityFilterOpt = "low"
+	AllPriority PriorityFilterOpt = "all"
+)
+
+type StatusFiterOpt string
+
+const (
+	Complete   StatusFiterOpt = "complete"
+	InProgress StatusFiterOpt = "inprogress"
+	Canceled   StatusFiterOpt = "canceled"
+	AllStatus  StatusFiterOpt = "all"
+)
+
+type TaskFilterProps struct {
+	AssignedTo uuid.UUID
+	Limit      int32
+	Page       int32
+	OrderBy    string
+	Priority   PriorityFilterOpt
+	Status     StatusFiterOpt
 }

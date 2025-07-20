@@ -30,7 +30,7 @@ type Task struct {
 	Place              string          `json:"place"`
 	Deadline           time.Time       `json:"deadline"`
 	AssignedEmployeeID string          `json:"assigned_employee_id"`
-	AssignedEmployee   userEntity.User `json:"assigned_employee" gorm:"foreignKey:AssignedEmployeeID;references:Id"`
+	AssignedEmployee   userEntity.User `json:"assigned_employee" gorm:"foreignKey:AssignedEmployeeID;references:Id;OnDelete:SET NULL"`
 	Priority           TaskPriority    `json:"priority" gorm:"type:priority_enum"`
 	Status             Status          `json:"status" gorm:"type:status_enum"`
 	UpdatedAt          time.Time       `json:"updated_at"`

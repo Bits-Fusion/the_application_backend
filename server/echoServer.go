@@ -13,6 +13,10 @@ import (
 	userRepo "github.com/Bits-Fusion/the_application_backend/features/users/repositories"
 	userUsecase "github.com/Bits-Fusion/the_application_backend/features/users/usecases"
 
+	taskHandlers "github.com/Bits-Fusion/the_application_backend/features/tasks/handlers"
+	taskRepo "github.com/Bits-Fusion/the_application_backend/features/tasks/repositories"
+	taskUsecase "github.com/Bits-Fusion/the_application_backend/features/tasks/usecases"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -55,7 +59,7 @@ func (s *echoServer) Start() {
 	})
 
 	serverUrl := fmt.Sprintf(":%d", s.conf.Server.Port)
-	s.initializeUserRoutes()
+	s.initializeRoutes()
 	data, err := json.MarshalIndent(s.app.Routes(), "", "  ")
 	if err != nil {
 		return
@@ -64,7 +68,7 @@ func (s *echoServer) Start() {
 	s.app.Logger.Fatal(s.app.Start(serverUrl))
 }
 
-func (s *echoServer) initializeUserRoutes() {
+func (s *echoServer) initializeRoutes() {
 	newUserRepo := userRepo.NewUserPostgresRepository(s.db)
 	newUserUsecase := userUsecase.NewUserUsecase(newUserRepo)
 	newUserHttp := userHandlers.NewUserHandler(newUserUsecase, s.conf.TokenConfig, s.auth)
@@ -82,4 +86,14 @@ func (s *echoServer) initializeUserRoutes() {
 	authRouter.GET("/:id", newUserHttp.GetUser)
 	authRouter.PATCH("/:id", newUserHttp.UpdateUser)
 	authRouter.DELETE("/delete/:id", newUserHttp.DeleteUser)
+
+	newTaskRepo := taskRepo.NewTaskRepository(s.db)
+	newTaskUsecase := taskUsecase.NewTaskUsecase(newTaskRepo)
+	newTaskHandler := taskHandlers.NewTaskHandler(newTaskUsecase)
+
+	taskRouter := s.app.Group("/v1/task")
+	taskRouter.Use(s.JWTMiddleware)
+
+	taskRouter.POST("/", newTaskHandler.CreateTask)
+	taskRouter.GET("/", newTaskHandler.ListTasks)
 }

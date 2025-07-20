@@ -48,7 +48,11 @@ func (r *userRepositoryImpl) ListUsers(params entities.FilterParams) ([]entities
 	var users []entities.User
 
 	page := max(params.Page, 1)
-	limit := max(params.Limit, 10)
+
+	limit := params.Limit
+	if limit <= 0 {
+		limit = 10
+	}
 
 	offset := (page - 1) * limit
 	order := "id asc"
