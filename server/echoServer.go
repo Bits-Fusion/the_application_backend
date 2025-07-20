@@ -104,4 +104,6 @@ func (s *echoServer) initializeRoutes() {
 
 	taskRouter.POST("/", newTaskHandler.CreateTask)
 	taskRouter.GET("/", newTaskHandler.ListTasks)
+	taskRouter.PATCH("/:taskId", newTaskHandler.UpdateTask)
+	taskRouter.DELETE("/:taskId", newTaskHandler.DeleteTask)
 }

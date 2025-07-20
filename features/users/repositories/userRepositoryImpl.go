@@ -3,6 +3,7 @@ package repositories
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/Bits-Fusion/the_application_backend/database"
 	"github.com/Bits-Fusion/the_application_backend/features/users/entities"
@@ -155,6 +156,8 @@ func (r *userRepositoryImpl) UpdateUser(in *entities.InsertUserDTO, userId strin
 	if in.ProfilePicture != "" {
 		user.ProfileImage = in.ProfilePicture
 	}
+
+	user.UpdatedAt = time.Now()
 
 	if err := r.db.GetDb().Save(&user).Error; err != nil {
 		return entities.User{}, err

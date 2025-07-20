@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/Bits-Fusion/the_application_backend/features/tasks/entities"
 	"github.com/google/uuid"
 )
 
@@ -18,14 +19,14 @@ type TaskModel struct {
 }
 
 type TaskModelUpdate struct {
-	Title              string    `json:"title"`
-	Description        string    `json:"description"`
-	Date               time.Time `json:"date"`
-	Place              string    `json:"place"`
-	Deadline           time.Time `json:"deadline"`
-	AssignedEmployeeID string    `json:"assignedTo"`
-	Priority           string    `json:"priority"`
-	Status             string    `json:"status"`
+	Title              string                `json:"title"`
+	Description        string                `json:"description"`
+	Date               time.Time             `json:"date"`
+	Place              string                `json:"place"`
+	Deadline           time.Time             `json:"deadline"`
+	AssignedEmployeeID string                `json:"assignedTo"`
+	Priority           entities.TaskPriority `validate:"omitempty,oneof=low medium high" json:"priority"`
+	Status             entities.Status       `validate:"omitempty,oneof=completed inprogress canceled" json:"status"`
 }
 
 type PriorityFilterOpt string
