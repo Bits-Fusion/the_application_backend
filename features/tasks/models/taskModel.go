@@ -17,6 +17,17 @@ type TaskModel struct {
 	Status             string    `validate:"required,oneof=completed inprogress canceled" json:"status"`
 }
 
+type TaskModelUpdate struct {
+	Title              string    `json:"title"`
+	Description        string    `json:"description"`
+	Date               time.Time `json:"date"`
+	Place              string    `json:"place"`
+	Deadline           time.Time `json:"deadline"`
+	AssignedEmployeeID string    `json:"assignedTo"`
+	Priority           string    `json:"priority"`
+	Status             string    `json:"status"`
+}
+
 type PriorityFilterOpt string
 
 const (

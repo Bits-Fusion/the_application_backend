@@ -64,14 +64,24 @@ func (h *taskHandlerImpl) CreateTask(c echo.Context) error {
 }
 
 func (h *taskHandlerImpl) ListTasks(c echo.Context) error {
-	limit := c.QueryParams().Get("limit")
-	page := c.QueryParams().Get("page")
-	orderBy := c.QueryParams().Get("oreder_by")
-	assignedTo := c.QueryParams().Get("assigned_to")
+	limit := c.QueryParam("limit")
+	page := c.QueryParam("page")
+	orderBy := c.QueryParam("oreder_by")
+	assignedTo := c.QueryParam("assigned_to")
+	priority := c.QueryParam("priority")
+	status := c.QueryParam("status")
 
 	var filterOpts models.TaskFilterProps
 
 	filterOpts.OrderBy = orderBy
+
+	if status != "" {
+		filterOpts.Status = models.StatusFiterOpt(status)
+	}
+
+	if priority != "" {
+		filterOpts.Priority = models.PriorityFilterOpt(priority)
+	}
 
 	limitInt, _ := strconv.ParseInt(limit, 10, 32)
 	pageInt, _ := strconv.ParseInt(page, 10, 32)
@@ -80,7 +90,6 @@ func (h *taskHandlerImpl) ListTasks(c echo.Context) error {
 	filterOpts.Page = int32(pageInt)
 
 	if assignedTo != "" {
-
 		assignedToId, err := uuid.Parse(assignedTo)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]string{
@@ -99,7 +108,7 @@ func (h *taskHandlerImpl) ListTasks(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusAccepted, map[string][]entities.Task{
+	return c.JSON(200, map[string][]entities.Task{
 		"tasks": tasks,
 	})
 }

@@ -51,7 +51,15 @@ func (s *echoServer) Start() {
 
 	s.app.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowMethods: []string{echo.GET, echo.POST, echo.PATCH, echo.DELETE, echo.OPTIONS},
+		AllowHeaders: []string{
+			echo.HeaderOrigin,
+			echo.HeaderContentType,
+			echo.HeaderAccept,
+			echo.HeaderAuthorization,
+		},
+		ExposeHeaders:    []string{echo.HeaderAuthorization},
+		AllowCredentials: true,
 	}))
 
 	s.app.GET("/v1/health", func(c echo.Context) error {
