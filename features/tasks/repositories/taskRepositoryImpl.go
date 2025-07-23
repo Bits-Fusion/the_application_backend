@@ -2,11 +2,11 @@ package repositories
 
 import (
 	"errors"
-	"time"
-
+	"fmt"
 	"github.com/Bits-Fusion/the_application_backend/database"
 	"github.com/Bits-Fusion/the_application_backend/features/tasks/entities"
 	"github.com/Bits-Fusion/the_application_backend/features/tasks/models"
+	userEntity "github.com/Bits-Fusion/the_application_backend/features/users/entities"
 	userModel "github.com/Bits-Fusion/the_application_backend/features/users/models"
 	"github.com/google/uuid"
 )
@@ -22,24 +22,28 @@ func NewTaskRepository(db database.Database) *taskRepository {
 }
 
 func (r *taskRepository) CreateTask(in *entities.InsertTask) error {
-	asUUID, err := uuid.Parse(in.AssignedEmployeeID)
+	var assignedUsers []userEntity.User
 
-	if err != nil {
-		return err
+	for _, userID := range in.AssignedEmployees {
+		parsedID, err := uuid.Parse(userID)
+		if err != nil {
+			return fmt.Errorf("invalid user ID %s: %w", userID, err)
+		}
+		assignedUsers = append(assignedUsers, userEntity.User{Id: parsedID, Role: "user"})
 	}
 
 	task := &entities.Task{
-		Title:              in.Title,
-		Description:        in.Description,
-		Date:               in.Date,
-		Place:              in.Place,
-		Deadline:           in.Deadline,
-		AssignedEmployeeID: asUUID,
-		Priority:           in.Priority,
-		Status:             in.Status,
+		Title:             in.Title,
+		Description:       in.Description,
+		Date:              in.Date,
+		Place:             in.Place,
+		Deadline:          in.Deadline,
+		Priority:          in.Priority,
+		Status:            in.Status,
+		AssignedEmployees: assignedUsers,
 	}
 
-	return r.db.GetDb().Create(task).Error
+	return r.db.GetDb().Debug().Create(task).Error
 }
 
 func (r *taskRepository) ListTask(params models.TaskFilterProps) ([]entities.Task, error) {
@@ -57,10 +61,12 @@ func (r *taskRepository) ListTask(params models.TaskFilterProps) ([]entities.Tas
 		order = params.OrderBy
 	}
 
-	query := r.db.GetDb().Model(&entities.Task{}).Preload("AssignedEmployee")
+	query := r.db.GetDb().Model(&entities.Task{}).Preload("AssignedEmployees")
 
 	if params.AssignedTo != uuid.Nil {
-		query = query.Where("assigned_employee_id = ?", params.AssignedTo.String())
+		query = query.
+			Joins("JOIN task_assignees ON task_assignees.task_id = tasks.id").
+			Where("task_assignees.user_id = ?", params.AssignedTo)
 	}
 
 	if params.Priority != models.AllPriority && params.Priority != "" {
@@ -107,10 +113,6 @@ func (r *taskRepository) UpdateTask(in *entities.UpdateTask, taskId string) (ent
 		task.Deadline = *in.Deadline
 	}
 
-	if in.AssignedEmployeeID != nil {
-		task.AssignedEmployeeID = *in.AssignedEmployeeID
-	}
-
 	if in.Priority != nil {
 		task.Priority = *in.Priority
 	}
@@ -119,13 +121,22 @@ func (r *taskRepository) UpdateTask(in *entities.UpdateTask, taskId string) (ent
 		task.Status = *in.Status
 	}
 
-	task.UpdatedAt = time.Now()
+	if in.AssignedEmployeeIDs != nil {
+		var assignedUsers []userEntity.User
+
+		for _, userID := range *in.AssignedEmployeeIDs {
+			assignedUsers = append(assignedUsers, userEntity.User{Id: userID, Role: "user"})
+		}
+		if err := r.db.GetDb().Model(&task).Association("AssignedEmployees").Replace(assignedUsers); err != nil {
+			return entities.Task{}, err
+		}
+	}
 
 	if err := r.db.GetDb().Save(&task).Error; err != nil {
 		return entities.Task{}, err
 	}
 
-	if err := r.db.GetDb().Preload("AssignedEmployee").First(&task, "id = ?", task.Id).Error; err != nil {
+	if err := r.db.GetDb().Preload("AssignedEmployees").First(&task, "id = ?", task.Id).Error; err != nil {
 		return entities.Task{}, err
 	}
 

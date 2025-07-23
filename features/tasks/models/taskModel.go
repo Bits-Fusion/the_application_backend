@@ -8,25 +8,25 @@ import (
 )
 
 type TaskModel struct {
-	Title              string    `validate:"required" json:"title"`
-	Description        string    `validate:"required" json:"description"`
-	Date               time.Time `validate:"required" json:"date"`
-	Place              string    `validate:"required" json:"place"`
-	Deadline           time.Time `validate:"required" json:"deadline"`
-	AssignedEmployeeID string    `validate:"required" json:"assignedTo"`
-	Priority           string    `validate:"required,oneof=low medium high" json:"priority"`
-	Status             string    `validate:"required,oneof=completed inprogress canceled" json:"status"`
+	Title               string    `validate:"required" json:"title"`
+	Description         string    `validate:"required" json:"description"`
+	Date                time.Time `validate:"required" json:"date"`
+	Place               string    `validate:"required" json:"place"`
+	Deadline            time.Time `validate:"required" json:"deadline"`
+	AssignedEmployeeIDs []string  `validate:"omitempty,dive,required,uuid4" json:"assignedTo"`
+	Priority            string    `validate:"required,oneof=low medium high" json:"priority"`
+	Status              string    `validate:"required,oneof=completed inprogress canceled" json:"status"`
 }
 
 type TaskModelUpdate struct {
-	Title              string                `json:"title"`
-	Description        string                `json:"description"`
-	Date               time.Time             `json:"date"`
-	Place              string                `json:"place"`
-	Deadline           time.Time             `json:"deadline"`
-	AssignedEmployeeID string                `json:"assignedTo"`
-	Priority           entities.TaskPriority `validate:"omitempty,oneof=low medium high" json:"priority"`
-	Status             entities.Status       `validate:"omitempty,oneof=completed inprogress canceled" json:"status"`
+	Title               string                `json:"title"`
+	Description         string                `json:"description"`
+	Date                time.Time             `json:"date"`
+	Place               string                `json:"place"`
+	Deadline            time.Time             `json:"deadline"`
+	AssignedEmployeeIDs []string              `validate:"omitempty,dive,required,uuid4" json:"assignedTo"`
+	Priority            entities.TaskPriority `validate:"omitempty,oneof=low medium high" json:"priority"`
+	Status              entities.Status       `validate:"omitempty,oneof=completed inprogress canceled" json:"status"`
 }
 
 type PriorityFilterOpt string
