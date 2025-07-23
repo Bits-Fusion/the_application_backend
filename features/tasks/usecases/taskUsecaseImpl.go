@@ -1,6 +1,8 @@
 package usecases
 
 import (
+	"fmt"
+
 	"github.com/Bits-Fusion/the_application_backend/features/tasks/entities"
 	"github.com/Bits-Fusion/the_application_backend/features/tasks/models"
 	"github.com/Bits-Fusion/the_application_backend/features/tasks/repositories"
@@ -19,15 +21,16 @@ func NewTaskUsecase(taskRepo repositories.TaskRepository) *taskUsecaseImpl {
 }
 
 func (u *taskUsecaseImpl) CreateTask(in *models.TaskModel) error {
+
 	task := entities.InsertTask{
-		Title:              in.Title,
-		Description:        in.Description,
-		Date:               in.Date,
-		Place:              in.Place,
-		Deadline:           in.Deadline,
-		AssignedEmployeeID: in.AssignedEmployeeID,
-		Priority:           entities.TaskPriority(in.Priority),
-		Status:             entities.Status(in.Status),
+		Title:             in.Title,
+		Description:       in.Description,
+		Date:              in.Date,
+		Place:             in.Place,
+		Deadline:          in.Deadline,
+		AssignedEmployees: in.AssignedEmployeeIDs,
+		Priority:          entities.TaskPriority(in.Priority),
+		Status:            entities.Status(in.Status),
 	}
 	return u.taskRepo.CreateTask(&task)
 }
@@ -59,8 +62,18 @@ func (u *taskUsecaseImpl) UpdateTask(in *models.TaskModelUpdate, taskId string) 
 		updateTaskData.Deadline = &in.Deadline
 	}
 
-	if uid, err := uuid.Parse(in.AssignedEmployeeID); err != nil && uuid.Nil != uid {
-		updateTaskData.AssignedEmployeeID = &uid
+	if len(in.AssignedEmployeeIDs) > 0 {
+		var parsedIDs []uuid.UUID
+		for _, idStr := range in.AssignedEmployeeIDs {
+			uid, err := uuid.Parse(idStr)
+			if err != nil {
+				return entities.Task{}, fmt.Errorf("invalid UUID in assignedTo: %v", err)
+			}
+			if uid != uuid.Nil {
+				parsedIDs = append(parsedIDs, uid)
+			}
+		}
+		updateTaskData.AssignedEmployeeIDs = &parsedIDs
 	}
 
 	if in.Priority != "" {
@@ -71,16 +84,7 @@ func (u *taskUsecaseImpl) UpdateTask(in *models.TaskModelUpdate, taskId string) 
 		updateTaskData.Status = &in.Status
 	}
 
-	if in.AssignedEmployeeID != "" {
-		uid, err := uuid.Parse(in.AssignedEmployeeID)
-		if err != nil || uid == uuid.Nil {
-			return entities.Task{}, err
-		}
-		updateTaskData.AssignedEmployeeID = &uid
-	}
-
 	task, err := u.taskRepo.UpdateTask(&updateTaskData, taskId)
-
 	if err != nil {
 		return entities.Task{}, err
 	}
