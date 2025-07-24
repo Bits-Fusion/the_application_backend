@@ -56,7 +56,7 @@ func (r *taskRepository) ListTask(params models.TaskFilterProps) ([]entities.Tas
 	}
 	offset := (page - 1) * limit
 
-	order := "id asc"
+	order := "id desc"
 	if params.OrderBy != "" {
 		order = params.OrderBy
 	}
