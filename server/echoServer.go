@@ -17,6 +17,10 @@ import (
 	taskRepo "github.com/Bits-Fusion/the_application_backend/features/tasks/repositories"
 	taskUsecase "github.com/Bits-Fusion/the_application_backend/features/tasks/usecases"
 
+	leadHandlers "github.com/Bits-Fusion/the_application_backend/features/leads/handlers"
+	leadRepo "github.com/Bits-Fusion/the_application_backend/features/leads/repositories"
+	leadUsecase "github.com/Bits-Fusion/the_application_backend/features/leads/usecases"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -106,4 +110,12 @@ func (s *echoServer) initializeRoutes() {
 	taskRouter.GET("/", newTaskHandler.ListTasks)
 	taskRouter.PATCH("/:taskId", newTaskHandler.UpdateTask)
 	taskRouter.DELETE("/:taskId", newTaskHandler.DeleteTask)
+
+	newLeadRepo := leadRepo.NewLeadRepository(s.db)
+	newLeadUsecase := leadUsecase.NewLeadUsecase(newLeadRepo)
+	newLeadHandler := leadHandlers.NewLeadHandler(newLeadUsecase)
+
+	leadRouter := s.app.Group("/v1/lead")
+
+	leadRouter.POST("/", newLeadHandler.CreateLead)
 }
