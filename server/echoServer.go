@@ -116,6 +116,10 @@ func (s *echoServer) initializeRoutes() {
 	newLeadHandler := leadHandlers.NewLeadHandler(newLeadUsecase)
 
 	leadRouter := s.app.Group("/v1/lead")
+	leadRouter.Use(s.JWTMiddleware)
 
 	leadRouter.POST("/", newLeadHandler.CreateLead)
+	leadRouter.GET("/", newLeadHandler.ListLeads)
+	leadRouter.PATCH("/:leadId", newLeadHandler.UpdateLead)
+	leadRouter.DELETE("/:leadId", newLeadHandler.DeleteLead)
 }
