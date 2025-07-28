@@ -25,7 +25,7 @@ type Lead struct {
 	Stage             string            `json:"stage"`
 	MeetingDate       time.Time         `json:"meeting_date"`
 	Details           string            `json:"details"`
-	AssignedEmployees []userEntity.User `json:"assigned_employees" gorm:"many2many:lead_assignees;"`
+	AssignedEmployees []userEntity.User `json:"assigned_employees" gorm:"many2many:lead_assignees;constraint:OnDelete:CASCADE;"`
 	Priority          LeadsPriority     `json:"priority" gorm:"type:priority_enum"`
 	CreatedAt         time.Time         `json:"created_at"`
 	UpdatedAT         time.Time         `json:"updated_at"`
@@ -46,21 +46,3 @@ type InsertLead struct {
 	LeadValue         int32         `json:"lead_value"`
 	AssignedEmployees []string
 }
-
-/*
-   name varchar(255)
-   contact_person varchar(255)
-   email email
-   phone_number varchar(25)
-   company varchar(255)
-   address varchar(255)
-   stage  varchar(255)
-   meeting_date datetime
-   details text(255)
-   assigned_employee varchar(255)
-   priority enum
-   reminder boolean
-   lead_value int
-   updated_at datetime
-   created_at datetime
-*/

@@ -19,6 +19,12 @@ type UserUpdateModel struct {
 	ProfilePicture string `json:"profilePicture"`
 }
 
+type PasswordReset struct {
+	Email       string `json:"email" validate:"required,email"`
+	NewPassword string `json:"newPassword" validate:"required,min=7"`
+	Otp         string `json:"otp" validate:"required,min=6"`
+}
+
 type ChunkDeletePayload struct {
 	UserIds []string `validate:"required" json:"userIds"`
 }

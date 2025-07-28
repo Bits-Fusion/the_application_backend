@@ -1,18 +1,33 @@
 [
   {
-    "method": "DELETE",
-    "path": "/v1/user/delete/:id",
-    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).DeleteUser-fm"
-  },
-  {
-    "method": "PATCH",
-    "path": "/v1/task/:taskId",
-    "name": "github.com/Bits-Fusion/the_application_backend/features/tasks/handlers.(*taskHandlerImpl).UpdateTask-fm"
+    "method": "echo_route_not_found",
+    "path": "/v1/lead/*",
+    "name": "github.com/labstack/echo/v4.init.func1"
   },
   {
     "method": "GET",
-    "path": "/v1/health",
-    "name": "github.com/Bits-Fusion/the_application_backend/server.(*echoServer).Start.func1"
+    "path": "/v1/user/:id",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).GetUser-fm"
+  },
+  {
+    "method": "echo_route_not_found",
+    "path": "/v1/task",
+    "name": "github.com/labstack/echo/v4.init.func1"
+  },
+  {
+    "method": "POST",
+    "path": "/v1/task/",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/tasks/handlers.(*taskHandlerImpl).CreateTask-fm"
+  },
+  {
+    "method": "GET",
+    "path": "/v1/lead/",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/leads/handlers.(*leadHandler).ListLeads-fm"
+  },
+  {
+    "method": "POST",
+    "path": "/v1/auth/signup",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).SignUp-fm"
   },
   {
     "method": "POST",
@@ -26,6 +41,51 @@
   },
   {
     "method": "GET",
+    "path": "/v1/user/",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).ListUsers-fm"
+  },
+  {
+    "method": "PATCH",
+    "path": "/v1/user/:id",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).UpdateUser-fm"
+  },
+  {
+    "method": "DELETE",
+    "path": "/v1/user/delete/:id",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).DeleteUser-fm"
+  },
+  {
+    "method": "DELETE",
+    "path": "/v1/lead/:leadId",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/leads/handlers.(*leadHandler).DeleteLead-fm"
+  },
+  {
+    "method": "GET",
+    "path": "/v1/health",
+    "name": "github.com/Bits-Fusion/the_application_backend/server.(*echoServer).Start.func1"
+  },
+  {
+    "method": "PATCH",
+    "path": "/v1/task/:taskId",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/tasks/handlers.(*taskHandlerImpl).UpdateTask-fm"
+  },
+  {
+    "method": "echo_route_not_found",
+    "path": "/v1/lead",
+    "name": "github.com/labstack/echo/v4.init.func1"
+  },
+  {
+    "method": "POST",
+    "path": "/v1/lead/",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/leads/handlers.(*leadHandler).CreateLead-fm"
+  },
+  {
+    "method": "PATCH",
+    "path": "/v1/lead/:leadId",
+    "name": "github.com/Bits-Fusion/the_application_backend/features/leads/handlers.(*leadHandler).UpdateLead-fm"
+  },
+  {
+    "method": "GET",
     "path": "/v1/task/",
     "name": "github.com/Bits-Fusion/the_application_backend/features/tasks/handlers.(*taskHandlerImpl).ListTasks-fm"
   },
@@ -35,48 +95,13 @@
     "name": "github.com/labstack/echo/v4.init.func1"
   },
   {
-    "method": "GET",
-    "path": "/v1/user/",
-    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).ListUsers-fm"
-  },
-  {
     "method": "echo_route_not_found",
-    "path": "/v1/task",
+    "path": "/v1/task/*",
     "name": "github.com/labstack/echo/v4.init.func1"
   },
   {
     "method": "DELETE",
     "path": "/v1/task/:taskId",
     "name": "github.com/Bits-Fusion/the_application_backend/features/tasks/handlers.(*taskHandlerImpl).DeleteTask-fm"
-  },
-  {
-    "method": "POST",
-    "path": "/v1/auth/signup",
-    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).SignUp-fm"
-  },
-  {
-    "method": "GET",
-    "path": "/v1/user/:id",
-    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).GetUser-fm"
-  },
-  {
-    "method": "echo_route_not_found",
-    "path": "/v1/task/*",
-    "name": "github.com/labstack/echo/v4.init.func1"
-  },
-  {
-    "method": "POST",
-    "path": "/v1/task/",
-    "name": "github.com/Bits-Fusion/the_application_backend/features/tasks/handlers.(*taskHandlerImpl).CreateTask-fm"
-  },
-  {
-    "method": "POST",
-    "path": "/v1/lead/",
-    "name": "github.com/Bits-Fusion/the_application_backend/features/leads/handlers.(*leadHandler).CreateLead-fm"
-  },
-  {
-    "method": "PATCH",
-    "path": "/v1/user/:id",
-    "name": "github.com/Bits-Fusion/the_application_backend/features/users/handlers.(*userHandlerImpl).UpdateUser-fm"
   }
 ]

@@ -184,6 +184,6 @@ func (u *userUsecaseImpl) GetUserData(filterBy entities.FilterField, values ...s
 	return u.UserRepository.GetUserData(filterBy, values...)
 }
 
-func (u *userUsecaseImpl) DeleteUser(deletionMode models.DeleteMode, userId []string) (bool, error) {
+func (u *userUsecaseImpl) DeleteUser(deletionMode models.DeleteMode, userId ...string) (bool, error) {
 	return u.UserRepository.DeleteUser(deletionMode, userId...)
 }

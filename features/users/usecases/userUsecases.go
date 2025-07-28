@@ -10,5 +10,5 @@ type UserUsecase interface {
 	UpdateUser(in *models.UserUpdateModel, userId string) (entities.User, error)
 	ListUser(params entities.FilterParams) ([]entities.User, error)
 	GetUserData(filterBy entities.FilterField, values ...string) (entities.User, error)
-	DeleteUser(deletionMode models.DeleteMode, userId []string) (bool, error)
+	DeleteUser(deletionMode models.DeleteMode, userId ...string) (bool, error)
 }

@@ -54,7 +54,7 @@ func (s *echoServer) Start() {
 	s.app.Use(middleware.Logger())
 
 	s.app.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:3000"},
+		AllowOrigins: []string{"*"},
 		AllowMethods: []string{echo.GET, echo.POST, echo.PATCH, echo.DELETE, echo.OPTIONS},
 		AllowHeaders: []string{
 			echo.HeaderOrigin,
@@ -116,6 +116,10 @@ func (s *echoServer) initializeRoutes() {
 	newLeadHandler := leadHandlers.NewLeadHandler(newLeadUsecase)
 
 	leadRouter := s.app.Group("/v1/lead")
+	leadRouter.Use(s.JWTMiddleware)
 
 	leadRouter.POST("/", newLeadHandler.CreateLead)
+	leadRouter.GET("/", newLeadHandler.ListLeads)
+	leadRouter.PATCH("/:leadId", newLeadHandler.UpdateLead)
+	leadRouter.DELETE("/:leadId", newLeadHandler.DeleteLead)
 }
