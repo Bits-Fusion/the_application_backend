@@ -77,7 +77,7 @@ func (r *userRepositoryImpl) DeleteUser(deleteMode models.DeleteMode, userId ...
 		}
 		return true, nil
 	case models.Single:
-		ctx := r.db.GetDb().Delete(&entities.User{}, userId[0])
+		ctx := r.db.GetDb().Delete(&entities.User{}, userId)
 		if ctx.RowsAffected == 0 {
 			return false, errors.New("no recored found with this Id")
 		}
