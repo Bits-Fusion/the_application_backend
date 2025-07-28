@@ -160,10 +160,8 @@ func (h *userHandlerImpl) GetUser(e echo.Context) error {
 
 func (h *userHandlerImpl) DeleteUser(c echo.Context) error {
 	userId := c.Param("id")
-	var userIds []string
 
-	userIds = append(userIds, userId)
-	_, err := h.userUsecase.DeleteUser(models.Single, userIds)
+	_, err := h.userUsecase.DeleteUser(models.Single, userId)
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{
