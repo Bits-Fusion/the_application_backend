@@ -10,19 +10,25 @@ type UserModel struct {
 }
 
 type UserUpdateModel struct {
-	Username       string `json:"username"`
-	PhoneNumber    string `json:"phoneNumber"`
-	FirstName      string `json:"firstName"`
-	LastName       string `json:"lastName"`
-	Email          string `json:"email"`
-	Password       string `json:"password"`
-	ProfilePicture string `json:"profilePicture"`
+	Username       string   `json:"username"`
+	PhoneNumber    string   `json:"phoneNumber"`
+	FirstName      string   `json:"firstName"`
+	LastName       string   `json:"lastName"`
+	Email          string   `json:"email"`
+	Permission     []string `validate:"omitempty,dive,permissionformat" json:"permission"`
+	Password       string   `json:"password"`
+	ProfilePicture string   `json:"profilePicture"`
 }
 
 type PasswordReset struct {
 	Email       string `json:"email" validate:"required,email"`
 	NewPassword string `json:"newPassword" validate:"required,min=7"`
 	Otp         string `json:"otp" validate:"required,min=6"`
+}
+
+type CreateUserTokenPayload struct {
+	Email    string `json:"email" validate:"required,email,max=255"`
+	Password string `json:"password" validate:"required,min=7,max=72"`
 }
 
 type ChunkDeletePayload struct {
