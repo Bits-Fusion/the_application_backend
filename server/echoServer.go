@@ -1,9 +1,9 @@
 package server
 
 import (
-	"encoding/json"
+	/* 	"encoding/json" */
 	"fmt"
-	"os"
+	// 	"os"
 
 	"github.com/Bits-Fusion/the_application_backend/config"
 	"github.com/Bits-Fusion/the_application_backend/database"
@@ -20,6 +20,9 @@ import (
 	leadHandlers "github.com/Bits-Fusion/the_application_backend/features/leads/handlers"
 	leadRepo "github.com/Bits-Fusion/the_application_backend/features/leads/repositories"
 	leadUsecase "github.com/Bits-Fusion/the_application_backend/features/leads/usecases"
+
+	"github.com/Bits-Fusion/the_application_backend/features/permissions/entities"
+	permissionRepo "github.com/Bits-Fusion/the_application_backend/features/permissions/repositories"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -72,17 +75,19 @@ func (s *echoServer) Start() {
 
 	serverUrl := fmt.Sprintf(":%d", s.conf.Server.Port)
 	s.initializeRoutes()
-	data, err := json.MarshalIndent(s.app.Routes(), "", "  ")
-	if err != nil {
-		return
-	}
-	os.WriteFile("routes.json", data, 0644)
+	// data, err := json.MarshalIndent(s.app.Routes(), "", "  ")
+	// if err != nil {
+	// 	return
+	// }
+	// os.WriteFile("routes.json", data, 0644)
 	s.app.Logger.Fatal(s.app.Start(serverUrl))
 }
 
 func (s *echoServer) initializeRoutes() {
+	newPermissionRepo := permissionRepo.NewPermissionRepository(s.db)
+
 	newUserRepo := userRepo.NewUserPostgresRepository(s.db)
-	newUserUsecase := userUsecase.NewUserUsecase(newUserRepo)
+	newUserUsecase := userUsecase.NewUserUsecase(newUserRepo, newPermissionRepo)
 	newUserHttp := userHandlers.NewUserHandler(newUserUsecase, s.conf.TokenConfig, s.auth)
 
 	userSign := s.app.Group("/v1/auth")
@@ -94,10 +99,10 @@ func (s *echoServer) initializeRoutes() {
 
 	authRouter.Use(s.JWTMiddleware)
 
-	authRouter.GET("/", newUserHttp.ListUsers)
-	authRouter.GET("/:id", newUserHttp.GetUser)
+	authRouter.GET("/", newUserHttp.ListUsers, s.RequirePermission(entities.ActionView, "user"))
+	authRouter.GET("/:id", newUserHttp.GetUser, s.RequirePermission(entities.ActionView, "user"))
 	authRouter.PATCH("/:id", newUserHttp.UpdateUser)
-	authRouter.DELETE("/delete/:id", newUserHttp.DeleteUser)
+	authRouter.DELETE("/delete/:id", newUserHttp.DeleteUser, s.RequirePermission(entities.ActionDelete, "user"))
 
 	newTaskRepo := taskRepo.NewTaskRepository(s.db)
 	newTaskUsecase := taskUsecase.NewTaskUsecase(newTaskRepo)
@@ -106,10 +111,10 @@ func (s *echoServer) initializeRoutes() {
 	taskRouter := s.app.Group("/v1/task")
 	taskRouter.Use(s.JWTMiddleware)
 
-	taskRouter.POST("/", newTaskHandler.CreateTask)
-	taskRouter.GET("/", newTaskHandler.ListTasks)
-	taskRouter.PATCH("/:taskId", newTaskHandler.UpdateTask)
-	taskRouter.DELETE("/:taskId", newTaskHandler.DeleteTask)
+	taskRouter.POST("/", newTaskHandler.CreateTask, s.RequirePermission(entities.ActionCreate, "task"))
+	taskRouter.GET("/", newTaskHandler.ListTasks, s.RequirePermission(entities.ActionView, "task"))
+	taskRouter.PATCH("/:taskId", newTaskHandler.UpdateTask, s.RequirePermission(entities.ActionUpdate, "task"))
+	taskRouter.DELETE("/:taskId", newTaskHandler.DeleteTask, s.RequirePermission(entities.ActionDelete, "task"))
 
 	newLeadRepo := leadRepo.NewLeadRepository(s.db)
 	newLeadUsecase := leadUsecase.NewLeadUsecase(newLeadRepo)
@@ -118,8 +123,8 @@ func (s *echoServer) initializeRoutes() {
 	leadRouter := s.app.Group("/v1/lead")
 	leadRouter.Use(s.JWTMiddleware)
 
-	leadRouter.POST("/", newLeadHandler.CreateLead)
-	leadRouter.GET("/", newLeadHandler.ListLeads)
-	leadRouter.PATCH("/:leadId", newLeadHandler.UpdateLead)
-	leadRouter.DELETE("/:leadId", newLeadHandler.DeleteLead)
+	leadRouter.POST("/", newLeadHandler.CreateLead, s.RequirePermission(entities.ActionCreate, "lead"))
+	leadRouter.GET("/", newLeadHandler.ListLeads, s.RequirePermission(entities.ActionView, "lead"))
+	leadRouter.PATCH("/:leadId", newLeadHandler.UpdateLead, s.RequirePermission(entities.ActionUpdate, "lead"))
+	leadRouter.DELETE("/:leadId", newLeadHandler.DeleteLead, s.RequirePermission(entities.ActionDelete, "lead"))
 }

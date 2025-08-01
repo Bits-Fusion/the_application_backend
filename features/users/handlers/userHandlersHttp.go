@@ -12,6 +12,7 @@ import (
 	"github.com/Bits-Fusion/the_application_backend/features/users/models"
 	"github.com/Bits-Fusion/the_application_backend/features/users/usecases"
 	"github.com/Bits-Fusion/the_application_backend/internal/auth"
+	customvalidator "github.com/Bits-Fusion/the_application_backend/internal/customValidator"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -25,25 +26,22 @@ type userHandlerImpl struct {
 	userUsecase usecases.UserUsecase
 	config      *config.TokenConfig
 	auth        auth.Authenticator
+	validate    *validator.Validate
 }
-
-type CreateUserTokenPayload struct {
-	Email    string `json:"email" validate:"required,email,max=255"`
-	Password string `json:"password" validate:"required,min=3,max=72"`
-}
-
-var validate = validator.New()
 
 func NewUserHandler(usecase usecases.UserUsecase, config *config.TokenConfig, auth auth.Authenticator) *userHandlerImpl {
+	var validate = validator.New()
+	validate.RegisterValidation("permissionformat", customvalidator.PermissionFormatValidator)
 	return &userHandlerImpl{
 		userUsecase: usecase,
 		config:      config,
 		auth:        auth,
+		validate:    validate,
 	}
 }
 
 func (h *userHandlerImpl) SignIn(c echo.Context) error {
-	var reqBody CreateUserTokenPayload
+	var reqBody models.CreateUserTokenPayload
 
 	if err := c.Bind(&reqBody); err != nil {
 		log.Errorf("Error binding request body: %v", err)
@@ -52,7 +50,7 @@ func (h *userHandlerImpl) SignIn(c echo.Context) error {
 		})
 	}
 
-	if err := validate.Struct(reqBody); err != nil {
+	if err := h.validate.Struct(reqBody); err != nil {
 		errs := make(map[string]string)
 
 		if validationErrs, ok := err.(validator.ValidationErrors); ok {
@@ -111,7 +109,7 @@ func (h *userHandlerImpl) SignUp(c echo.Context) error {
 		})
 	}
 
-	if err := validate.Struct(reqBody); err != nil {
+	if err := h.validate.Struct(reqBody); err != nil {
 		errs := make(map[string]string)
 
 		if validationErrs, ok := err.(validator.ValidationErrors); ok {
@@ -202,6 +200,7 @@ func (h *userHandlerImpl) ListUsers(e echo.Context) error {
 }
 
 func (h *userHandlerImpl) UpdateUser(c echo.Context) error {
+	// validator.RegisterValidation("permissionformat", customvalidator.PermissionFormatValidator)
 	id := c.Param("id")
 
 	var reqBody models.UserUpdateModel
@@ -213,7 +212,7 @@ func (h *userHandlerImpl) UpdateUser(c echo.Context) error {
 		})
 	}
 
-	if err := validate.Struct(reqBody); err != nil {
+	if err := h.validate.Struct(reqBody); err != nil {
 		errs := make(map[string]string)
 
 		if validationErrs, ok := err.(validator.ValidationErrors); ok {

@@ -1,1 +1,1 @@
-# the_application_backend
+# go based backend for selse trucker

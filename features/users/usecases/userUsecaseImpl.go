@@ -6,6 +6,9 @@ import (
 	"regexp"
 	"strings"
 
+	permissionEntity "github.com/Bits-Fusion/the_application_backend/features/permissions/entities"
+	permissionRepo "github.com/Bits-Fusion/the_application_backend/features/permissions/repositories"
+
 	"github.com/Bits-Fusion/the_application_backend/features/users/entities"
 	"github.com/Bits-Fusion/the_application_backend/features/users/models"
 	"github.com/Bits-Fusion/the_application_backend/features/users/repositories"
@@ -15,14 +18,17 @@ import (
 )
 
 type userUsecaseImpl struct {
-	UserRepository repositories.UserRepository
+	UserRepository       repositories.UserRepository
+	PermissionRepository permissionRepo.PermissionRepository
 }
 
 func NewUserUsecase(
 	userRepository repositories.UserRepository,
+	permissionRepository permissionRepo.PermissionRepository,
 ) *userUsecaseImpl {
 	return &userUsecaseImpl{
-		UserRepository: userRepository,
+		UserRepository:       userRepository,
+		PermissionRepository: permissionRepository,
 	}
 }
 
@@ -119,6 +125,48 @@ func (u *userUsecaseImpl) UpdateUser(in *models.UserUpdateModel, userId string) 
 		}
 
 		user.Username = in.Username
+	}
+
+	if in.Permission != nil {
+		var createdPermissions []permissionEntity.Permission
+
+		allowedActions := make(map[string]struct{})
+		allowedActions["view"] = struct{}{}
+		allowedActions["create"] = struct{}{}
+		allowedActions["update"] = struct{}{}
+		allowedActions["delete"] = struct{}{}
+
+		allowedResources := make(map[string]struct{})
+
+		allowedResources["task"] = struct{}{}
+		allowedResources["lead"] = struct{}{}
+		allowedResources["user"] = struct{}{}
+
+		for _, perm := range in.Permission {
+			tot := strings.Split(perm, "_")
+
+			if len(tot) != 2 {
+				log.Error("invalid permission type ")
+				continue
+			}
+			if _, ok := allowedActions[tot[1]]; !ok {
+				log.Error("invalid permission action")
+				continue
+			}
+			if _, ok := allowedResources[tot[0]]; !ok {
+				log.Error("invalid permission resource")
+				continue
+			}
+
+			permission, err := u.PermissionRepository.CreatePermission(tot[1], tot[0])
+
+			if err != nil {
+				log.Error(err)
+			}
+
+			createdPermissions = append(createdPermissions, *permission)
+		}
+		user.Permission = createdPermissions
 	}
 
 	if in.Email != "" {

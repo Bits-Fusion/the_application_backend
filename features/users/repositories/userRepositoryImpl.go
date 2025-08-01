@@ -6,9 +6,10 @@ import (
 	"time"
 
 	"github.com/Bits-Fusion/the_application_backend/database"
+	permissionEntity "github.com/Bits-Fusion/the_application_backend/features/permissions/entities"
 	"github.com/Bits-Fusion/the_application_backend/features/users/entities"
 	"github.com/Bits-Fusion/the_application_backend/features/users/models"
-	"github.com/labstack/gommon/log"
+	"gorm.io/gorm"
 )
 
 type userRepositoryImpl struct {
@@ -36,11 +37,9 @@ func (r *userRepositoryImpl) InsertUserData(in *entities.InsertUserDTO) error {
 	result := r.db.GetDb().Create(data)
 
 	if result.Error != nil {
-		log.Errorf("InsertCockroachData: %v", result.Error)
 		return result.Error
 	}
 
-	log.Debugf("InsertCockroachData: %v", result.RowsAffected)
 	return nil
 
 }
@@ -61,7 +60,7 @@ func (r *userRepositoryImpl) ListUsers(params entities.FilterParams) ([]entities
 		order = params.OrderBy
 	}
 
-	if err := r.db.GetDb().Order(order).Limit(int(limit)).Offset(int(offset)).Find(&users).Error; err != nil {
+	if err := r.db.GetDb().Preload("Permissions").Order(order).Limit(int(limit)).Offset(int(offset)).Find(&users).Error; err != nil {
 		return nil, err
 	}
 
@@ -118,7 +117,10 @@ func (r *userRepositoryImpl) querySingleField(query string, values []string, use
 	if len(values) < 1 {
 		return *user, fmt.Errorf("missing query value")
 	}
-	err := r.db.GetDb().Where(query, values[0]).First(user).Error
+	err := r.db.GetDb().Preload("Permissions").Where(query, values[0]).First(user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return *user, errors.New("user with this Id doesn't exist")
+	}
 	return *user, err
 }
 
@@ -126,6 +128,10 @@ func (r *userRepositoryImpl) UpdateUser(in *entities.InsertUserDTO, userId strin
 	var user entities.User
 
 	if err := r.db.GetDb().First(&user, "id = ?", userId).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return entities.User{}, errors.New("user with this user Id doesn't exist")
+		}
+
 		return entities.User{}, err
 	}
 
@@ -163,7 +169,28 @@ func (r *userRepositoryImpl) UpdateUser(in *entities.InsertUserDTO, userId strin
 		return entities.User{}, err
 	}
 
+	if in.Permission != nil {
+		if err := r.addPermission(in.Permission, user); err != nil {
+			return entities.User{}, err
+		}
+	}
+
+	if err := r.db.GetDb().Preload("Permissions").First(&user, "id = ?", userId).Error; err != nil {
+		return entities.User{}, err
+	}
+
 	user.Password = ""
 
 	return user, nil
+}
+
+func (r *userRepositoryImpl) addPermission(permission []permissionEntity.Permission, user entities.User) error {
+
+	user.Permissions = permission
+
+	if err := r.db.GetDb().Save(&user).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
