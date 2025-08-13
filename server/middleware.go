@@ -1,8 +1,6 @@
 package server
 
 import (
-	// "fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -12,7 +10,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	// "github.com/labstack/gommon/log"
 )
 
 func (server *echoServer) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
@@ -59,7 +56,7 @@ func (s *echoServer) RequirePermission(action permissionEntity.Action, resource 
 			if err != nil {
 				return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 			}
-			log.Print(user)
+
 			for _, perm := range user.Permissions {
 				if perm.Action == action && perm.Resource == resource {
 					return next(c)
